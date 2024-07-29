@@ -11,16 +11,18 @@ def getip():
     res=req.get('https://api.ipify.org')
     return res.text
 
-ip=getip()
-def getloc():
-    res=req.get(f"http://ip-api.com/json/{ip}")
-    data=res.json()
-    return data["city"]
 
-LOC=getloc()
+def getloc(ip):
+    res = req.get(f"https://ipinfo.io/{ip}/json")
+    data = res.json()
+    if "city" in data:
+        return data["city"]
+    else:
+        return "Unknown"
 
 
-def get_weather():
+
+def get_weather(LOC,KEY):
     res=req.get(f"http://api.openweathermap.org/data/2.5/forecast?q={LOC}&appid={KEY}")
     data=res.json()
     return data
@@ -40,9 +42,13 @@ def notifier():
         timeout=10, 
     )
 def main():
-    city_data=get_weather()
+    ip=getip()
+    LOC=getloc(ip)
+    
+    city_data=get_weather(LOC,KEY)
     if rain_check(city_data):
         notifier()
+    print(LOC)
 
 
 
